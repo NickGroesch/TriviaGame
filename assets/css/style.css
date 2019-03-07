@@ -1,0 +1,26 @@
+body {
+  background: blue;
+}
+h1 {
+  font-size: 30px;
+}
+.container {
+  position: relative;
+  top: 100px;
+  margin: auto;
+  width: 800px;
+  height: 600px;
+  background: orange;
+}
+.wrapper {
+  text-align: center;
+  position: relative;
+  top: 100px;
+  margin: auto;
+  width: 600px;
+  height: 500px;
+}
+
+.game {
+  color: blueviolet;
+}
