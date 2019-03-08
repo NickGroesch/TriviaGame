@@ -27,6 +27,8 @@ $(document).ready(function() {
   start.addClass("start");
   start.text("PRESS START");
   $(".game").append(start);
+  // sets the countdown
+  var time = 121;
   // runs when start is clicked
   function startIt() {
     console.log("click");
@@ -42,12 +44,11 @@ $(document).ready(function() {
       var Qid = "id" + i;
       answers.attr("id", Qid);
       var nameT = "true" + i;
-      //perhaps this could be dryier, but it works...
+      //perhaps this could functified for dryness, but it works...
       answers.append(
         $("<input type='radio'>")
           .attr("name", Qid)
           .attr("id", nameT)
-          .attr("data-bool", true)
       );
       answers.append(
         $("<label>")
@@ -59,7 +60,6 @@ $(document).ready(function() {
         $("<input type='radio'>")
           .attr("name", Qid)
           .attr("id", nameF)
-          .attr("data-bool", false)
       );
       answers.append(
         $("<label>")
@@ -71,8 +71,63 @@ $(document).ready(function() {
     //at end of question list create submit button
     var submitIt = $("<button class='submit'>").text("Submit");
     $(".game").append(submitIt);
+    // starts the final countdown
+    countDown = setInterval(clock, 1000);
   }
+  // this function runs the clock
+  function clock() {
+    time--;
+    console.log(time);
+
+    var dispTime = minsec(time);
+    $(".time").text(dispTime);
+    if (time == 0) {
+      timesUp();
+    }
+  }
+  // this function makes the countdown legible
+  function minsec(para) {
+    var min = Math.floor(para / 60);
+    var sec = para - min * 60;
+    if (sec < 10) {
+      sec = "0" + sec;
+    }
+    return `${min}:${sec}`;
+  }
+  // this function runs the game ending when time runs out
+  var late = false;
+  function timesUp() {
+    $(".time").text("You ran out of time");
+    clearInterval(countDown);
+    late = true;
+    gradeIt();
+  }
+  // this solution to making sure the radio buttons are checked is gratefully inspired by:
+  // https://stackoverflow.com/questions/2072249/using-jquery-to-check-if-no-radio-button-in-a-group-has-been-checked
+  function completed(param) {
+    var bool = $(`input:radio[name=${param}]`).is(":checked");
+    return bool;
+  }
+
   function gradeIt() {
+    // stops the clock
+    clearInterval(countDown);
+    // get the player values from the radio buttons, slicing off the last digit
+    var playerA = [];
+    for (i = 0; i < trivia.length; i++) {
+      var Qid = "id" + i;
+      var Aid;
+      if (!completed(Qid) && !late) {
+        $(".game").prepend("<h4>Finish the game!</h4>");
+        countDown = setInterval(clock, 1000);
+        return;
+      } else if (!completed(Qid)) {
+        Aid = `blank${i}`;
+      } else {
+        Aid = $("input:radio:checked")[i].id;
+      }
+      playerA.push(Aid.slice(0, -1));
+    }
     // get the answer values from the trivia array
     var triviaA = [];
     for (i = 0; i < trivia.length; i++) {
@@ -80,23 +135,31 @@ $(document).ready(function() {
       triviaA.push(qA.toString());
     }
     console.log(triviaA);
-    // get the player values from the radio buttons, slicing off the last digit
-    var playerA = [];
-    for (i = 0; i < trivia.length; i++) {
-      var Aid = $("input:radio:checked")[i].id;
-      playerA.push(Aid.slice(0, -1));
-    }
     console.log(playerA);
+    // now we compare the arrays to find if each element matches, and display it
     $(".game").empty();
+    var rights = 0;
+    var wrongs = 0;
     for (i = 0; i < trivia.length; i++) {
       if (playerA[i] === triviaA[i]) {
-        $(".game").append($("<p>").text("answer number " + i + "was right"));
-      } else
-        $(".game").append($("<p>").text("answer number " + i + "was wrong"));
+        $(".game").append($("<p>").text(`Answer number  ${i + 1} was right.`));
+        rights++;
+      } else {
+        $(".game").append($("<p>").text(`Answer number  ${i + 1} was wrong.`));
+        wrongs++;
+      }
     }
+    // lately we discovered we prefer template literals
+    var rightsCount = `You got ${rights} questions right!`;
+    var wrongsCount = `You got ${wrongs} questions wrong!`;
+    $(".game").append(`<br><p>${rightsCount}</p><p>${wrongsCount}</p>`);
   }
 
   //   handle button clicks- start doesn't need document prefix because it is generated on load, rather than later
+  //  this way we logically order our game to call the functions defined above
   $(".start").on("click", startIt);
   $(document).on("click", ".submit", gradeIt);
+  //   function() {
+  //   if(completed()) all questions are answered
+  // });
 });
