@@ -73,9 +73,29 @@ $(document).ready(function() {
     $(".game").append(submitIt);
   }
   function gradeIt() {
-    // need to get value of radio buttons selected to compare to the A: key
-    console.log($("input:radio:checked").id);
+    // get the answer values from the trivia array
+    var triviaA = [];
+    for (i = 0; i < trivia.length; i++) {
+      var qA = trivia[i].A;
+      triviaA.push(qA.toString());
+    }
+    console.log(triviaA);
+    // get the player values from the radio buttons, slicing off the last digit
+    var playerA = [];
+    for (i = 0; i < trivia.length; i++) {
+      var Aid = $("input:radio:checked")[i].id;
+      playerA.push(Aid.slice(0, -1));
+    }
+    console.log(playerA);
+    $(".game").empty();
+    for (i = 0; i < trivia.length; i++) {
+      if (playerA[i] === triviaA[i]) {
+        $(".game").append($("<p>").text("answer number " + i + "was right"));
+      } else
+        $(".game").append($("<p>").text("answer number " + i + "was wrong"));
+    }
   }
+
   //   handle button clicks- start doesn't need document prefix because it is generated on load, rather than later
   $(".start").on("click", startIt);
   $(document).on("click", ".submit", gradeIt);
