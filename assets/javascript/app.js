@@ -21,7 +21,7 @@ $(document).ready(function() {
         "Epimenides is attributed with the paradox wherein you cannot take at face value some character who says 'I am always lying.'",
       A: true
     },
-    { Q: "Principia Mathematica was written by Isaac Newton", A: false },
+    { Q: "Principia Mathematica was written by Isaac Newton.", A: false },
     { Q: "An inconsistent theory could prove its own consistency.", A: true }
   ];
   // create start button
